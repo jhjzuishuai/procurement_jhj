@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>采购文件智能生成</title>
+    <link rel="icon" href="data:," />
+    <!-- 样式沿用原项目 styles.css，补充样式单独放 app-extra.css -->
+    <link rel="stylesheet" href="/static/styles.css" />
+    <link rel="stylesheet" href="/static/app-extra.css" />
+  </head>
+  <body>
+    <!-- ========== 登录页 ========== -->
+    <section class="auth-screen" id="authScreen">
+      <form class="auth-card" id="loginForm">
+        <div class="brand auth-brand">
+          <div class="brand-mark">采</div>
+          <div>
+            <h1>采购文件智能生成</h1>
+          </div>
+        </div>
+
+        <label>
+          <span>账号</span>
+          <input id="loginUsername" value="admin" placeholder="admin" autocomplete="username" required />
+        </label>
+
+        <label>
+          <span>密码</span>
+          <input id="loginPassword" type="password" value="Jhj@123456" placeholder="Jhj@123456" autocomplete="current-password" required />
+        </label>
+
+        <button type="submit" class="primary-button">登录</button>
+        <p class="login-hint" id="loginHint"></p>
+
+        <div class="demo-accounts">
+          <strong>演示账号</strong>
+          <span>管理员：admin / Jhj@123456</span>
+          <span>采购员：buyer / Buyer@123</span>
+          <span>专家：expert / Expert@123</span>
+        </div>
+      </form>
+    </section>
+
+    <!-- ========== 主界面 ========== -->
+    <div class="app-shell simple-shell" id="appShell" hidden>
+      <aside class="workspace-sidebar">
+        <div class="sidebar-title">
+          <span class="brand-mark">采</span>
+          <div>
+            <strong>采购文件生成</strong>
+            <span>工作区</span>
+          </div>
+        </div>
+        <nav class="side-nav" aria-label="主导航">
+          <button class="nav-item active" data-view="workspace" type="button">工作台</button>
+          <button class="nav-item" data-view="records" type="button">记录</button>
+        </nav>
+      </aside>
+
+      <main class="main-content">
+        <header class="simple-header">
+          <div>
+            <h1>采购技术规格书智能生成</h1>
+          </div>
+          <div class="header-actions">
+            <div class="user-strip">
+              <span id="currentUser">未登录</span>
+              <strong id="currentRole"></strong>
+              <button class="text-button" id="logoutBtn" type="button">退出</button>
+            </div>
+          </div>
+        </header>
+
+        <!-- ---------- 工作台 ---------- -->
+        <section class="view active" id="workspace-view">
+          <div class="simple-grid">
+            <section class="panel input-panel" id="inputSection">
+              <div class="panel-header">
+                <div><h3>采购需求</h3></div>
+                <span class="run-state" id="runState">等待输入</span>
+              </div>
+
+              <form id="requirementForm" class="form-stack">
+                <label>
+                  <span>需求标题 <em>*</em></span>
+                  <input id="title" value="2026年机房服务器采购项目" placeholder="2026年机房服务器采购项目" required />
+                </label>
+
+                <label>
+                  <span>自然语言需求 <em>*</em></span>
+                  <textarea id="content" rows="8" placeholder="例如：采购机架式服务器100台，预算为800万元，合同签订后45天内完成供货。CPU不低于32核64线程，内存不低于512GB DDR5……" required></textarea>
+                </label>
+
+                <div class="field-row">
+                  <label>
+                    <span>采购品类</span>
+                    <select id="categorySelect"></select>
+                  </label>
+                  <label>
+                    <span>预算金额</span>
+                    <input id="budget" type="number" min="0" placeholder="留 0 自动识别" />
+                  </label>
+                </div>
+
+                <div class="field-row">
+                  <label>
+                    <span>交付周期</span>
+                    <input id="delivery" placeholder="45天" />
+                  </label>
+                  <label>
+                    <span>供应商要求</span>
+                    <input id="supplier" placeholder="具备营业执照、同类项目经验" />
+                  </label>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="primary-button">生成文件</button>
+                  <button type="button" class="secondary-button" id="demoBtn">填入示例</button>
+                </div>
+              </form>
+            </section>
+
+            <section class="panel process-panel" id="processPanel">
+              <div class="panel-header">
+                <div><h3>解析参数</h3></div>
+                <button class="text-button" id="copyParamsBtn" type="button">复制 JSON</button>
+              </div>
+              <div class="structured-box">
+                <pre id="structuredOutput">暂无数据</pre>
+              </div>
+            </section>
+          </div>
+
+          <div class="output-grid">
+            <section class="panel document-panel simple-document" id="outputSection">
+              <div class="panel-header">
+                <div><h3>采购文件草案</h3></div>
+                <div class="section-tabs" id="sectionTabs"></div>
+              </div>
+
+              <div class="document-preview" id="documentPreview">
+                <p class="empty-text">暂无草案</p>
+              </div>
+
+              <div class="document-actions">
+                <span class="edit-state" id="editState">未生成</span>
+                <button class="primary-button" id="exportBtn" type="button" disabled>导出 Word</button>
+              </div>
+
+              <aside class="risk-panel output-risk-panel" id="riskSection">
+                <div class="panel-header">
+                  <div><h3>风险预审</h3></div>
+                  <span class="risk-count" id="riskCount">0 项</span>
+                </div>
+                <div class="risk-summary">
+                  <div><strong>高风险</strong><span id="highRisk">0</span></div>
+                  <div><strong>中风险</strong><span id="mediumRisk">0</span></div>
+                  <div><strong>低风险</strong><span id="lowRisk">0</span></div>
+                </div>
+                <div class="risk-list" id="riskList">
+                  <p class="empty-text">暂无结果</p>
+                </div>
+              </aside>
+            </section>
+          </div>
+        </section>
+
+        <!-- ---------- 记录列表 ---------- -->
+        <section class="view" id="records-view">
+          <div class="panel records-panel">
+            <div class="panel-header">
+              <div><h3>生成记录</h3></div>
+              <span class="run-state" id="recordsTotal">共 0 条</span>
+            </div>
+
+            <div class="record-filters">
+              <label>
+                关键词
+                <input id="recordKeyword" type="search" placeholder="按标题搜索" />
+              </label>
+              <button class="secondary-button" id="recordSearchBtn" type="button">搜索</button>
+              <button class="secondary-button" id="recordResetBtn" type="button">重置</button>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>编号</th>
+                    <th>标题</th>
+                    <th>品类</th>
+                    <th>风险</th>
+                    <th>时间</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="recordTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,100 @@
+/* 本项目补充样式：块级编辑相关（styles.css 沿用原项目，不改动） */
+
+.block-row {
+  position: relative;
+  margin: 10px 0;
+  padding: 10px 12px;
+  border: 1px dashed transparent;
+  border-radius: 10px;
+}
+
+.block-row:hover {
+  border-color: var(--line);
+  background: var(--surface-soft);
+}
+
+.block-row.editing {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.block-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.block-index {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.block-tag {
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--info-soft);
+  color: var(--info);
+}
+
+.block-toolbar {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.block-toolbar button {
+  font-size: 12px;
+  padding: 3px 10px;
+}
+
+.block-editor textarea,
+.block-editor input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+
+.block-editor textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.block-editor .cell-input {
+  min-width: 96px;
+  padding: 4px 6px;
+}
+
+.block-editor table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.block-editor table td {
+  padding: 4px;
+  border: 1px solid var(--line);
+}
+
+.record-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.record-actions button {
+  font-size: 12px;
+  padding: 3px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.record-actions button:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
