@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+*.log
+data/app.db
+data/app.db-journal
+data/templates/*.docx
+data/exports/*.docx
+.idea/
+.vscode/
+chk*.txt
