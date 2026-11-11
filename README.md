@@ -106,13 +106,32 @@ uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 | buyer | Buyer@123 | 采购员 | 生成文件、查记录、导出 |
 | expert | Expert@123 | 采购专家 | 生成文件 + 风险复核 + 调整章节 |
 
-### 跑自测
+### 跑测试
+
+**方式一：pytest（推荐，27 项，约 10 秒）**
+
+```powershell
+.\.venv\Scripts\pip.exe install -r requirements-dev.txt   # 首次需要装 pytest
+.\.venv\Scripts\python.exe -m pytest
+```
+
+想看得更细：`-v` 每项一行，`--durations=8` 看哪几项最慢，`-x` 第一个失败就停。
+
+测试有三个刻意的设计：
+
+- **不碰演示库**：`tests/conftest.py` 在 `import app` 之前把 `DATABASE_URL` 指到 `data/test.db`
+- **不调真实大模型**：同一处把 `AI_API_KEY` 置空，走本地规则，结果可复现、不花钱、不受网络影响
+- **建表只做一次**：会话开始建表 + 写演示数据，每个测试之间只清业务数据
+
+覆盖：前端首页与静态资源、登录、当前用户、未登录 401、越权 403、退出后 token 失效、生成、参数识别（预算/数量/交付期/品类）、列表、详情、下载 Word、调整、版本、回滚、块级编辑（改/插/删 + 5 种非法输入）、重新预审、导出 Excel、批量导入、品类、审计日志。
+
+**方式二：老的冒烟脚本（30 项，print 风格，会写真实库）**
 
 ```powershell
 .\.venv\Scripts\python.exe tests\test_api.py
 ```
 
-会依次验证 30 项：前端首页及静态资源、登录、生成、参数识别、列表、详情、下载 Word、调整、版本、回滚、块级编辑（改/插/删/越界/空段落）、预审、导出 Excel、批量导入、品类、审计日志、未登录拦截、越权拦截。
+它按真实使用顺序走一遍、结果打印在屏幕上，适合"我只想快速确认服务还活着"。注意它用的是 `data\app.db`，会真的往演示库里加记录。
 
 ### 手工测试（有前端页面，也可以走 Swagger）
 
