@@ -1,0 +1,5 @@
+-r requirements.txt
+
+# 测试相关（只在开发时安装，生产环境不需要）
+pytest>=8.0.0
+pytest-asyncio>=0.24.0

@@ -6,6 +6,8 @@ venv/
 *.log
 data/app.db
 data/app.db-journal
+data/test.db
+data/test.db-journal
 data/templates/*.docx
 data/exports/*.docx
 .idea/
